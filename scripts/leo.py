@@ -18,13 +18,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="deploy servers and applications")
 
     parser.add_argument("cmd", type=str, nargs="?")
-    parser.add_argument("name", type=str, nargs="*")
+    parser.add_argument("name", type=str, nargs="+")
 
     args = parser.parse_args()
     if args.cmd == "init":
-        name = args.get('name', None)
-        if not name:
-            print("You must supply a name for the new server")
-            sys.exit()
-        else:
-            init(name)
+        init(args.name)
