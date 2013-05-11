@@ -2,13 +2,12 @@
 
 import boto.ec2
 import argparse
-import sys
 
 
 def init(name, size="small", ami="3fec7956"):
     ec2_id = open("/etc/aws-id")
     ec2_key = open("/etc/aws-key")
-    conn = boto.ec2.connect_to_region('us-east', ec2_id.read(), ec2_key.read())
+    conn = boto.ec2.connect_to_region('us-east', aws_access_key_id=ec2_id.read(), aws_secret_access_key=ec2_key.read())
 
     salt = open("salt.sh").read()
 
