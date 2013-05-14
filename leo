@@ -6,6 +6,8 @@ import argparse
 from fabric.api import env
 from fabric.api import *
 
+from redis import Redis
+
 from leonidas import create_server, get_active_names
 
 

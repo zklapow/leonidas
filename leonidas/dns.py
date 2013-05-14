@@ -2,7 +2,7 @@ import boto
 import boto.route53 as r53
 
 
-def create_dns_record(instance, name, region="us-east-1", zone=None):
+def create_dns_record(public_dns, name, region="us-east-1", zone=None):
     conn = boto.connect_route53()
 
     if zone is None:
@@ -11,4 +11,4 @@ def create_dns_record(instance, name, region="us-east-1", zone=None):
         zone = conn.get_hosted_zone_by_name(zone)
 
     dns = name + "." + zone.name
-    zone.add_cname(dns, instance.public_dns_name)
+    zone.add_cname(dns, public_dns)
