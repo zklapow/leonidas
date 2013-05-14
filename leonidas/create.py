@@ -1,16 +1,20 @@
 from .names import pick_name
+from .dns import create_dns_record
 
 from fabric.api import *
 from fabric.operations import get
 
 from sh import rm
 
+from rq import Connection, Queue
+from .tasks import highstate_after_ping
+
 import os.path
 
 fpath = os.path.dirname(os.path.abspath(__file__))
 
 
-def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956"):
+def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=None):
     if name is None:
         name = pick_name(conn)
 
@@ -44,7 +48,17 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956"):
                                      user_data=salt,
                                      instance_type=type)
 
-    reservation.instances[0].add_tag("Name", name)
+    # Name and DNS
+    instance = reservation.instances[0]
+    instance.add_tag("Name", name)
+    create_dns_record(instance, name)
+
+    # Run highstate on the salt master
+    if rconn is None:
+        rconn = Redis()
+    q = Queue(connection=rconn)
+
+    q.enqueue(highstate_after_ping, name)
 
     # Cleanup
     rm("tmp.pem")
