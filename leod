@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+import rq
 from rq import Connection, Worker
 
 if __name__ == "__main__":
     with Connection():
-        worker = Worker()
+        worker = Worker([rq.Queue()])
         worker.work()
