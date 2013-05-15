@@ -1,15 +1,16 @@
 from .names import pick_name
-from .dns import create_dns_record
 
 from fabric.api import *
 from fabric.operations import get
 
 from sh import rm
 
-from rq import Connection, Queue
+from rq import Queue
 from .tasks import highstate_after_ping, wait_for_dns_update, wait_for_ping, sync_grains
 
 import os.path
+import time
+import sys
 
 fpath = os.path.dirname(os.path.abspath(__file__))
 
@@ -50,6 +51,13 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=No
 
     # Name and DNS
     instance = reservation.instances[0]
+    sys.stdout.write('\nWaiting for %s to start.' % name)
+    while instance.state == 'pending':
+        sys.stdout.write('.')
+        time.sleep(1)
+        instance.update()
+    sys.stdout.write('\n')
+
     instance.add_tag("Name", name)
     instance.add_tag("env", "dev")
     instance.add_tag("role", "web")

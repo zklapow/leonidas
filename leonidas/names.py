@@ -15,7 +15,10 @@ def get_active_names(conn):
     res = conn.get_all_instances()
     instances = [i for r in res for i in r.instances]
     for i in instances:
-        active.append(i.__dict__['tags']['Name'])
+        try:
+            active.append(i.__dict__['tags']['Name'])
+        except KeyError:
+            pass
 
     return active
 
