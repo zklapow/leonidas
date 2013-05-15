@@ -67,7 +67,7 @@ def sync_grains(target, instance_id):
     conn = boto.connect_ec2()
 
     rl = conn.get_all_instances(instance_ids=[instance_id])
-    instance = rl[0].instance[0]
+    instance = rl[0].instances[0]
 
     tags = instance.__dict__['tags']
     for key in tags.keys():
