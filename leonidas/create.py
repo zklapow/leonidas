@@ -7,7 +7,7 @@ from fabric.operations import get
 from sh import rm
 
 from rq import Connection, Queue
-from .tasks import highstate_after_ping, wait_for_dns_update
+from .tasks import highstate_after_ping, wait_for_dns_update, wait_for_ping, sync_grains
 
 import os.path
 
@@ -51,6 +51,8 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=No
     # Name and DNS
     instance = reservation.instances[0]
     instance.add_tag("Name", name)
+    instance.add_tag("env", "dev")
+    instance.add_tag("role", "web")
 
     if rconn is None:
         rconn = Redis()
@@ -58,6 +60,12 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=No
 
     print("%s Public DNS: %s" % (name, instance.public_dns_name))
     q.enqueue(wait_for_dns_update, name, instance.id)
+
+    # Don't do anything else until salt is available
+    q.enqueue(wait_for_ping, name)
+
+    # This needs to be done before highstate
+    q.enqueue(sync_grains, name, instance.id)
 
     # Run highstate on the salt master
     q.enqueue(highstate_after_ping, name)

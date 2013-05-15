@@ -1,3 +1,16 @@
+def wait_for_ping(target):
+    import salt.client
+    client = salt.client.LocalClient()
+
+    while True:
+        ret = client.cmd(target, "test.ping")
+
+        # when the ping is seen and true
+        for key in ret.keys():
+            if key == target and ret[key]:
+                return
+
+
 def highstate(target="*"):
     import salt.client
     client = salt.client.LocalClient()
@@ -13,14 +26,10 @@ def highstate_after_ping(target):
     import salt.client
     client = salt.client.LocalClient()
 
-    ping = False
-    while not ping:
-        ret = client.cmd(target, "test.ping")
+    wait_for_ping(target)
 
-        # when the ping is seen and true
-        for key in ret.keys():
-            if key == target and ret[key]:
-                ping = True
+    # Sync grains first to make sure highstate is correct
+    client.cmd(target, 'saltutil.sync_grains')
 
     client.cmd(target, 'state.highstate')
 
@@ -40,3 +49,26 @@ def wait_for_dns_update(name, instance_id):
         dns = instance.public_dns_name
 
     create_dns_record(dns, name)
+
+
+def write_instance_id(target, instance_id):
+    import salt.client
+    client = salt.client.LocalClient()
+
+    client.cmd(target, 'cmd.run', ['touch /etc/id && cat "%s" > /etc/id' % instance_id])
+
+
+def sync_grains(target, instance_id):
+    import salt.client
+    client = salt.client.LocalClient()
+
+    import boto
+    import boto.ec2
+    conn = boto.connect_ec2()
+
+    rl = conn.get_all_instances(instance_ids=[instance_id])
+    instance = rl[0].instance[0]
+
+    tags = instance.__dict__['tags']
+    for key in tags.keys():
+        client.cmd(target, 'grains.setval', [key, tags[key]])
