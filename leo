@@ -16,7 +16,7 @@ def init(args):
 
     env.host_string = args.host_string
     with settings(user="ubuntu", host_string="salt.coherentclothes.com:22", key_filename=args.keyfile):
-        create_server(conn, args.name, rconn=Redis(host=args.redish))
+        create_server(conn, args.name, rconn=Redis(host=args.redish), role=args.role, env=args.env)
 
 
 def list_instances(args):
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     init_args = subparsers.add_parser('create')
     init_args.add_argument("name", type=str, nargs="?")
     init_args.add_argument("--redis-host", dest="redish", type=str, default="salt.coherentclothes.com")
+    init_args.add_argument("--role", dest="role", type=str, default="app")
+    init_args.add_argument("--env", dest="env", type=str, default="dev")
     init_args.set_defaults(func=init)
 
     list_args = subparsers.add_parser('list')

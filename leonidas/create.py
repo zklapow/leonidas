@@ -15,7 +15,7 @@ import sys
 fpath = os.path.dirname(os.path.abspath(__file__))
 
 
-def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=None):
+def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=None, role="app", env="dev"):
     if name is None:
         name = pick_name(conn)
 
@@ -59,8 +59,8 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=No
     sys.stdout.write('\n')
 
     instance.add_tag("Name", name)
-    instance.add_tag("env", "dev")
-    instance.add_tag("role", "web")
+    instance.add_tag("env", env)
+    instance.add_tag("role", role)
 
     if rconn is None:
         rconn = Redis()
