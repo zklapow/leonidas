@@ -28,8 +28,8 @@ def highstate_after_ping(target):
 
     wait_for_ping(target)
 
-    # Sync grains first to make sure highstate is correct
-    client.cmd(target, 'saltutil.sync_grains')
+    # Sync everything first to make sure highstate is correct
+    client.cmd(target, 'saltutil.sync_all')
 
     client.cmd(target, 'state.highstate')
 
