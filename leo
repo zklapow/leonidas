@@ -27,6 +27,9 @@ def list_instances(args):
         print(name)
 
 
+def deploy_repo(args):
+    deploy(args.target, args.path, arg.rev, Redis(args.redish))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="deploy servers and applications")
     subparsers = parser.add_subparsers()
@@ -34,16 +37,22 @@ if __name__ == "__main__":
     parser.add_argument("--salt-host", dest="host_string", type=str, default="ubuntu@salt.coherentclothes.com:22")
     parser.add_argument("-i", dest='keyfile', type=str, default="~/.ssh/zklapow.pem")
     parser.add_argument("--region", dest='region', type=str, default="us-east-1")
+    parser.add_argument("--target", dest='target', type=str, default="*")
+    parser.add_argument("--redis-host", dest="redish", type=str, default="salt.coherentclothes.com")
 
     init_args = subparsers.add_parser('create')
     init_args.add_argument("name", type=str, nargs="?")
-    init_args.add_argument("--redis-host", dest="redish", type=str, default="salt.coherentclothes.com")
     init_args.add_argument("--role", dest="role", type=str, default="app")
     init_args.add_argument("--env", dest="env", type=str, default="dev")
     init_args.set_defaults(func=init)
 
     list_args = subparsers.add_parser('list')
     list_args.set_defaults(func=list_instances)
+
+    deploy_args = subparsers.add_parser('deploy')
+    deploy_args.add_argument("--path", dest="path", type=str, default="/var/www/coherent")
+    deploy_args.add_argument("--rev", dest="rev", type=str, default="master")
+    deploy_args.set_defaults(func=deploy_repo)
 
     args = parser.parse_args()
     args.func(args)

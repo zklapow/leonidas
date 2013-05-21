@@ -28,6 +28,7 @@ def highstate_after_ping(target):
 
     wait_for_ping(target)
 
+    client.cmd(target, 'saltutil.sync_all')
     # Refresh pillar
     client.cmd(target, 'saltutil.refresh_pillar')
     # Sync everything first to make sure highstate is correct
@@ -74,3 +75,13 @@ def sync_grains(target, instance_id):
     tags = instance.__dict__['tags']
     for key in tags.keys():
         client.cmd(target, 'grains.setval', [key, tags[key]])
+
+
+def git_pull(target, path, rev):
+    import salt.client
+    client = salt.client.LocalClient()
+
+    # Fetch first
+    client.cmd(target, 'git.fetch', [path, '--all'])
+    # Then checkout
+    client.cmd(target, 'git.checkout', [path, rev])

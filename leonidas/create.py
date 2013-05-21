@@ -64,7 +64,7 @@ def create_server(conn, name=None, type="t1.micro", ami="ami-3fec7956", rconn=No
 
     if rconn is None:
         rconn = Redis()
-    q = Queue(connection=rconn, default_timeout=1800)
+    q = Queue(name, connection=rconn, default_timeout=1800)
 
     print("%s Public DNS: %s" % (name, instance.public_dns_name))
     q.enqueue_call(func=wait_for_dns_update, args=(name, instance.id), timeout=1800)
