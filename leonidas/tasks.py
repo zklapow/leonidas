@@ -90,4 +90,5 @@ def restart_supervisor(target):
     import salt.client
     client = salt.client.LocalClient()
 
-    client.cmd(target, 'service.restart', ['supervisor'])
+    client.cmd(target, 'service.stop', ['supervisor'])
+    client.cmd(target, 'service.start', ['supervisor'])
