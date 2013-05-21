@@ -82,7 +82,7 @@ def git_pull(target, path, rev):
     client = salt.client.LocalClient()
 
     # Fetch first
-    client.cmd(target, 'git.fetch', [path, '--all'])
+    client.cmd(target, 'git.pull', [path, '--all'])
     # Then checkout
     client.cmd(target, 'git.checkout', [path, rev])
 
