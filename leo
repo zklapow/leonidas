@@ -8,7 +8,7 @@ from fabric.api import *
 
 from redis import Redis
 
-from leonidas import create_server, get_active_names
+from leonidas import create_server, get_active_names, deploy
 
 
 def init(args):
@@ -28,7 +28,7 @@ def list_instances(args):
 
 
 def deploy_repo(args):
-    deploy(args.target, args.path, arg.rev, Redis(args.redish))
+    deploy(args.target, args.path, args.rev, Redis(args.redish))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="deploy servers and applications")

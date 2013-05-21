@@ -85,3 +85,9 @@ def git_pull(target, path, rev):
     client.cmd(target, 'git.fetch', [path, '--all'])
     # Then checkout
     client.cmd(target, 'git.checkout', [path, rev])
+
+def restart_supervisor(target):
+    import salt.client
+    client = salt.client.LocalClient()
+
+    client.cmd(target, 'service.restart', ['supervisor'])
